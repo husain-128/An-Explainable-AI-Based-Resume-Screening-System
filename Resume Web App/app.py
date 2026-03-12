@@ -290,9 +290,10 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
 @app.route('/admin')
-@login_required
+@login_required  # ← Automatically checks if user is logged in
 def admin():
-    """Admin page to view all users"""
-    users = User.query.all()
-    analyses = ResumeAnalysis.query.all()
-    return render_template('admin.html', users=users, analyses=analyses)
+    if current_user.email != '2005hussainvanak@example.com':  # ← Only checks email
+        flash('You do not have permission.', 'error')
+        return redirect(url_for('dashboard'))
+    # ... show admin page
+
