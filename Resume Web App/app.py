@@ -108,8 +108,8 @@ def generate_suggestions(missing_skills, matched_skills):
 @login_required
 def index():
     """User dashboard after login."""
-    return render_template('dashboard.html')
-
+    analyses = ResumeAnalysis.query.filter_by(user_id=current_user.id).order_by(ResumeAnalysis.created_at.desc()).all()
+    return render_template('dashboard.html', analyses=analyses)
 @app.route('/analyze', methods=['GET', 'POST'])
 @login_required
 def analyze():
@@ -286,14 +286,21 @@ def delete_analysis(analysis_id):
 with app.app_context():
     db.create_all()
 
+@app.route('/admin')
+@login_required
+def admin():
+    """Admin page to view all users"""
+    # Replace with your actual email
+    if current_user.email != '2005hussainvanak@gmail.com':
+        flash('You do not have permission to access this page.', 'error')
+        return redirect(url_for('dashboard'))
+    
+    users = User.query.all()
+    analyses = ResumeAnalysis.query.all()
+    return render_template('admin.html', users=users, analyses=analyses)
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
-@app.route('/admin')
-@login_required  # ← Automatically checks if user is logged in
-def admin():
-    if current_user.email != '2005hussainvanak@example.com':  # ← Only checks email
-        flash('You do not have permission.', 'error')
-        return redirect(url_for('dashboard'))
-    # ... show admin page
+
 
