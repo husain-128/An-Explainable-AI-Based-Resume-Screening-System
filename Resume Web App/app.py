@@ -289,3 +289,10 @@ with app.app_context():
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
+@app.route('/admin')
+@login_required
+def admin():
+    """Admin page to view all users"""
+    users = User.query.all()
+    analyses = ResumeAnalysis.query.all()
+    return render_template('admin.html', users=users, analyses=analyses)
