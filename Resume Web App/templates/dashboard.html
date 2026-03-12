@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AI Resume Screening</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome, {{ current_user.name }}!</h1>
+        <p>Upload a PDF resume and enter a job description to get a skill match score with explanations.</p>
+        <a href="{{ url_for('analyze') }}" class="btn">Analyze Resume</a>
+        <a href="{{ url_for('logout') }}" class="btn btn-secondary">Logout</a>
+        
+        <h2 style="margin-top: 30px;">Past Analyses</h2>
+        {% if analyses %}
+            <table class="analysis-table">
+                <thead>
+                    <tr>
+                        <th>Resume Name</th>
+                        <th>Job Description</th>
+                        <th>Match Score</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for analysis in analyses %}
+                    <tr>
+                        <td>{{ analysis.resume_name }}</td>
+                        <td>{{ analysis.job_description[:50] }}...</td>
+                        <td><span class="score">{{ analysis.match_score }}%</span></td>
+                        <td>{{ analysis.created_at.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('delete_analysis', analysis_id=analysis.id) }}" style="display: inline;">
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this analysis?')">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No past analyses found.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
